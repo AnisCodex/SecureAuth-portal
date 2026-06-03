@@ -1,5 +1,5 @@
 
-# 🔐 Spring Boot Login & Registration App
+# SecureAuth-portal
 
 A full-stack **Spring Boot** web application that implements user authentication with **Login & Registration**, using **PostgreSQL**, **Spring Data JPA**, and **Thymeleaf**.
 
