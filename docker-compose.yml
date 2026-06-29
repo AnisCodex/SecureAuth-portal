@@ -1,0 +1,44 @@
+services:
+
+  # ---------- PostgreSQL database container ----------
+  db:
+    image: postgres:16
+    container_name: secureauthportal-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: reg_login_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "123"
+    ports:
+      - "5433:5432"
+      # Mapped to 5433 on your machine (not 5432) so this container doesn't
+      # collide with the Postgres you already have installed locally.
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Keeps your data even if the container is stopped/removed/rebuilt.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ---------- Spring Boot application container ----------
+  app:
+    build: .
+    container_name: secureauthportal-app
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      # Activates application-docker.properties, which points the app at
+      # the "db" service below instead of localhost.
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+        # Waits for Postgres to be ready (not just "started") before
+        # starting the app, avoiding a race where the app tries to connect
+        # before the database is actually accepting connections.
+
+volumes:
+  pgdata:
