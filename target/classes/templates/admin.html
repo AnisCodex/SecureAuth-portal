@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Admin — SecureAuth Portal</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:       #0a0a12;
+            --border:   rgba(255,255,255,0.10);
+            --accent:   #6c63ff;
+            --accent2:  #ff6584;
+            --text:     #e8e8f0;
+            --muted:    #7a7a9a;
+            --card-bg:  rgba(255,255,255,0.04);
+        }
+
+        html, body {
+            min-height: 100%;
+            font-family: Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .blob {
+            position: fixed; border-radius: 50%;
+            filter: blur(90px); opacity: 0.28;
+            animation: drift 14s ease-in-out infinite alternate;
+            pointer-events: none; z-index: 0;
+        }
+        .blob-1 { width: 600px; height: 600px; background: #6c63ff; top: -200px; right: -100px; }
+        .blob-2 { width: 500px; height: 500px; background: #ff6584; bottom: -150px; left: -150px; animation-delay: -7s; }
+
+        @keyframes drift {
+            from { transform: translate(0,0) scale(1); }
+            to   { transform: translate(25px,20px) scale(1.05); }
+        }
+
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 40px; height: 64px;
+            background: rgba(10,10,18,0.75);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-brand {
+            font-family: Arial, sans-serif;
+            font-size: 20px; font-weight: 800;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .btn-logout {
+            padding: 9px 22px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text); font-family: Arial, sans-serif;
+            font-size: 14px; font-weight: 500;
+            cursor: pointer; text-decoration: none;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .btn-logout:hover { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.2); }
+
+        .main {
+            position: relative; z-index: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 24px 80px;
+        }
+
+        .page-tag {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(108,99,255,0.10);
+            border: 1px solid rgba(108,99,255,0.25);
+            border-radius: 99px;
+            padding: 6px 16px;
+            font-size: 13px; color: var(--accent);
+            font-weight: 500; margin-bottom: 20px;
+        }
+        .page-title {
+            font-family: Arial, sans-serif;
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .page-sub {
+            color: var(--muted); font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        .table-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--muted);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        td {
+            padding: 16px 20px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+
+        .role-badge {
+            display: inline-flex; align-items: center;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .role-ADMIN {
+            background: rgba(255,101,132,0.12);
+            border: 1px solid rgba(255,101,132,0.3);
+            color: var(--accent2);
+        }
+        .role-USER {
+            background: rgba(108,99,255,0.10);
+            border: 1px solid rgba(108,99,255,0.25);
+            color: var(--accent);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+        }
+
+        .role-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .role-select {
+            padding: 7px 10px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            outline: none;
+        }
+        .role-select:focus { border-color: var(--accent); }
+        .btn-update {
+            padding: 7px 14px;
+            background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s, opacity 0.2s;
+        }
+        .btn-update:hover { transform: translateY(-1px); opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<nav>
+    <div class="nav-brand"><span>🛠️</span> SecureAuth Portal Admin</div>
+    <a href="/logout" class="btn-logout">Sign out</a>
+</nav>
+
+<div class="main">
+    <div class="page-tag">🛠️ Admin only</div>
+    <h1 class="page-title">User Management</h1>
+    <p class="page-sub">All registered accounts and their roles.</p>
+
+    <div class="table-card">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Change Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="u : ${users}">
+                    <td th:text="${u.id}">1</td>
+                    <td th:text="${u.name}">Name</td>
+                    <td th:text="${u.email}">email@example.com</td>
+                    <td>
+                        <span class="role-badge"
+                              th:class="${'role-badge role-' + u.role}"
+                              th:text="${u.role}">USER</span>
+                    </td>
+                    <td>
+                        <form th:action="@{'/admin/users/' + ${u.id} + '/role'}" method="post" class="role-form">
+                            <select name="role" class="role-select">
+                                <option th:each="r : ${roles}"
+                                        th:value="${r}"
+                                        th:text="${r}"
+                                        th:selected="${r == u.role}">USER</option>
+                            </select>
+                            <button type="submit" class="btn-update">Update</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="empty-state" th:if="${users.isEmpty()}">
+            No users found.
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

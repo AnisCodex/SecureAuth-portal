@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Verify Email — SecureAuth Portal</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:        #0a0a12;
+            --border:    rgba(255,255,255,0.10);
+            --accent:    #43e97b;
+            --accent2:   #ff6584;
+            --text:      #e8e8f0;
+            --muted:     #7a7a9a;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .card {
+            max-width: 440px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px 40px;
+        }
+
+        .icon { font-size: 48px; margin-bottom: 20px; }
+
+        h1 {
+            font-size: 26px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            color: var(--muted);
+            font-size: 15px;
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 13px 28px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, var(--accent), #38f9d7);
+            color: #0a0a12;
+        }
+        .btn-error {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <div class="card">
+        <div class="icon" th:text="${verifySuccess} ? '✅' : '⚠️'">✅</div>
+        <h1 th:text="${verifySuccess} ? 'Email Verified' : 'Verification Failed'">Result</h1>
+        <p th:text="${verifyMsg}">Message goes here.</p>
+        <a href="/loginPage" class="btn" th:class="${verifySuccess} ? 'btn btn-success' : 'btn btn-error'">Go to Login</a>
+    </div>
+</div>
+
+</body>
+</html>
